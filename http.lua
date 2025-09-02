@@ -1,6 +1,19 @@
 local M = {}
 local parser = require("voiden.parser")
 
+local function normalize_lines(lines)
+  if not lines then
+    return {}
+  end
+  local out = {}
+  for _, l in ipairs(lines) do
+    -- supprime CR éventuel et garde LF
+    local clean_line = (l:gsub("\r", ""))
+    table.insert(out, clean_line)
+  end
+  return out
+end
+
 -- Assure qu'une fenêtre + buffer "VoidenOutput" existe
 local function ensure_output_win()
   local buf, win
@@ -42,6 +55,7 @@ end
 
 -- Append lines dans le buffer + scrolle la fenêtre correspondante
 local function append(buf, lines, prefix)
+  lines = normalize_lines(lines)
   if not lines then
     return
   end
