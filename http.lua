@@ -39,69 +39,92 @@ function M.run_request()
     return
   end
 
-  local block = blocks[1] -- TODO: sélectionner bloc sous le curseur
-  local cmd = { "curl", "-i", "-s", "-X", block.method, block.url }
-
-  for _, h in ipairs(block.headers) do
-    table.insert(cmd, "-H")
-    table.insert(cmd, h)
+  -- Fabrique une liste lisible pour le menu
+  local items = {}
+  for i, b in ipairs(blocks) do
+    local title = string.format("[%d] %s %s", i, b.method or "GET", b.url or "??")
+    table.insert(items, { idx = i, text = title, block = b })
   end
 
-  -- Prépare la fenêtre de sortie
-  local buf
-  local found = false
-  for _, b in ipairs(vim.api.nvim_list_bufs()) do
-    if vim.api.nvim_buf_get_name(b):match("VoidenOutput") then
-      buf = b
-      found = true
-      break
-    end
-  end
-  if not found then
-    vim.cmd("vsplit")
-    buf = vim.api.nvim_create_buf(false, true)
-    vim.api.nvim_buf_set_name(buf, "VoidenOutput")
-    vim.api.nvim_win_set_buf(0, buf)
-  else
-    vim.api.nvim_buf_set_lines(buf, 0, -1, false, {}) -- clear
-  end
-
-  local function append(lines, prefix)
-    if not lines then
+  vim.ui.select(items, {
+    prompt = "Sélectionne une requête à exécuter",
+    format_item = function(item)
+      return item.text
+    end,
+  }, function(choice)
+    if not choice then
+      vim.notify("[Voiden] Annulé", vim.log.levels.INFO)
       return
     end
-    local clean = {}
-    for _, l in ipairs(lines) do
-      if l ~= "" then
-        if prefix then
-          table.insert(clean, prefix .. l)
-        else
-          table.insert(clean, l)
+
+    local block = choice.block
+    local cmd = { "curl", "-i", "-s", "-X", block.method, block.url }
+    for _, h in ipairs(block.headers) do
+      table.insert(cmd, "-H")
+      table.insert(cmd, h)
+    end
+
+    -- Prépare la fenêtre de sortie
+    local buf
+    local found = false
+    for _, b in ipairs(vim.api.nvim_list_bufs()) do
+      if vim.api.nvim_buf_get_name(b):match("VoidenOutput") then
+        buf = b
+        found = true
+        break
+      end
+    end
+    if not found then
+      vim.cmd("vsplit")
+      buf = vim.api.nvim_create_buf(false, true)
+      vim.api.nvim_buf_set_name(buf, "VoidenOutput")
+      vim.api.nvim_win_set_buf(0, buf)
+    else
+      vim.api.nvim_buf_set_lines(buf, 0, -1, false, {}) -- clear
+    end
+
+    local function scroll_to_end(buf)
+      for _, win in ipairs(vim.api.nvim_list_wins()) do
+        if vim.api.nvim_win_get_buf(win) == buf then
+          local line_count = vim.api.nvim_buf_line_count(buf)
+          vim.api.nvim_win_set_cursor(win, { line_count, 0 })
         end
       end
     end
-    if #clean > 0 then
-      vim.api.nvim_buf_set_lines(buf, -1, -1, false, clean)
-      vim.api.nvim_win_set_cursor(0, { vim.api.nvim_buf_line_count(buf), 0 })
-    end
-  end
 
-  vim.fn.jobstart(cmd, {
-    stdout_buffered = false,
-    stderr_buffered = false,
-    on_stdout = function(_, data)
-      append(data)
-    end,
-    on_stderr = function(_, data)
-      append(data, "[ERR] ")
-    end,
-    on_exit = function(_, code)
-      vim.notify(
-        "[Voiden] Request terminé avec code: " .. code,
-        code == 0 and vim.log.levels.INFO or vim.log.levels.ERROR
-      )
-    end,
-  })
+    local function append(lines, prefix)
+      if not lines then
+        return
+      end
+      local clean = {}
+      for _, l in ipairs(lines) do
+        if l ~= "" then
+          table.insert(clean, (prefix or "") .. l)
+        end
+      end
+      if #clean > 0 then
+        vim.api.nvim_buf_set_lines(buf, -1, -1, false, clean)
+        scroll_to_end(buf)
+      end
+    end
+
+    vim.fn.jobstart(cmd, {
+      stdout_buffered = false,
+      stderr_buffered = false,
+      on_stdout = function(_, data)
+        append(data)
+      end,
+      on_stderr = function(_, data)
+        append(data, "[ERR] ")
+      end,
+      on_exit = function(_, code)
+        vim.notify(
+          string.format("[Voiden] '%s %s' terminé avec code: %d", block.method, block.url, code),
+          code == 0 and vim.log.levels.INFO or vim.log.levels.ERROR
+        )
+      end,
+    })
+  end)
 end
 
 return M
