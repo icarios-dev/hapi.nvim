@@ -23,6 +23,8 @@ steps for Hapi.nvim.
 - Support additional HTTP methods and authentication schemes.
 - Provide optional integration with Neovim keymaps for faster workflow.
 - Explore enhanced visualization of API responses (e.g., JSON formatting, tables).
+- Add integrated Neovim documentation for easy access to usage
+  instructions via :help.
 
 ## Long-term vision
 
