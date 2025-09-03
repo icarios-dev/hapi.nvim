@@ -16,6 +16,8 @@ steps for Hapi.nvim.
 - Refine parsing of Markdown-like request blocks.
 - Enhance multi-block selection and execution workflow.
 - Add configuration options for buffer/window behavior and notifications.
+- Test the plugin on real backend APIs to guide development with
+  practical use cases.
 
 ## Medium-term goals
 
@@ -25,6 +27,7 @@ steps for Hapi.nvim.
 - Explore enhanced visualization of API responses (e.g., JSON formatting, tables).
 - Add integrated Neovim documentation for easy access to usage
   instructions via :help.
+- Test the plugin on real-world APIs to ensure robustness and usability.
 
 ## Long-term vision
 
