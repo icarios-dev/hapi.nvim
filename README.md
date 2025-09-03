@@ -58,10 +58,10 @@ Using [lazy.nvim]:
 ```lua
 require("lazy").setup({
   {
-    "your-username/Hapi.nvim",
+    "icarios-dev/hapi.nvim",
     dependencies = { "nvim-telescope/telescope.nvim" },
     config = function()
-      require("hapi.commands").register()
+      require("hapi.setup").setup()
     end
   }
 })
