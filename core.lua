@@ -1,14 +1,14 @@
 local M = {}
-local config = require("voiden.config")
-local parser = require("voiden.parser")
-local http = require("voiden.http")
+local config = require("hapi.config")
+local parser = require("hapi.parser")
+local http = require("hapi.http")
 
 --- Exemple simple
 function M.hello()
   if config.options.debug then
-    print("[Voiden] Debug: hello called")
+    print("[Hapi] Debug: hello called")
   end
-  print("Hello Voiden.nvim 👋")
+  print("Hello Hapi.nvim 👋")
 end
 
 function M.parse_current()

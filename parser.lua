@@ -4,7 +4,7 @@ local function trim(s)
   return (s:gsub("^%s+", ""):gsub("%s+$", ""))
 end
 
---- Parse les blocs Voiden dans un buffer
+--- Parse les blocs Hapi dans un buffer
 ---@param bufnr number|nil buffer à parser (par défaut: courant)
 ---@return table[] Liste des blocs trouvés
 function M.parse(bufnr)

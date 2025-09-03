@@ -1,5 +1,5 @@
 local M = {}
-local parser = require("voiden.parser")
+local parser = require("hapi.parser")
 
 local function normalize_lines(lines)
   if not lines then
@@ -14,13 +14,13 @@ local function normalize_lines(lines)
   return out
 end
 
--- Assure qu'une fenêtre + buffer "VoidenOutput" existe
+-- Assure qu'une fenêtre + buffer "HapiOutput" existe
 local function ensure_output_win()
   local buf, win
 
   -- Vérifie si le buffer existe déjà
   for _, b in ipairs(vim.api.nvim_list_bufs()) do
-    if vim.api.nvim_buf_get_name(b):match("VoidenOutput") then
+    if vim.api.nvim_buf_get_name(b):match("HapiOutput") then
       buf = b
       break
     end
@@ -29,7 +29,7 @@ local function ensure_output_win()
   -- Sinon crée le buffer
   if not buf then
     buf = vim.api.nvim_create_buf(false, true)
-    vim.api.nvim_buf_set_name(buf, "VoidenOutput")
+    vim.api.nvim_buf_set_name(buf, "HapiOutput")
   else
     -- vide le contenu si réutilisé
     vim.api.nvim_buf_set_lines(buf, 0, -1, false, {})
@@ -80,7 +80,7 @@ end
 function M.run_request()
   local blocks = parser.parse()
   if #blocks == 0 then
-    vim.notify("[Voiden] Aucun bloc trouvé", vim.log.levels.WARN)
+    vim.notify("[Hapi] Aucun bloc trouvé", vim.log.levels.WARN)
     return
   end
 
@@ -98,7 +98,7 @@ function M.run_request()
     end,
   }, function(choice)
     if not choice then
-      vim.notify("[Voiden] Annulé", vim.log.levels.INFO)
+      vim.notify("[Hapi] Annulé", vim.log.levels.INFO)
       return
     end
 
@@ -122,7 +122,7 @@ function M.run_request()
       end,
       on_exit = function(_, code)
         vim.notify(
-          string.format("[Voiden] '%s %s' terminé avec code: %d", block.method, block.url, code),
+          string.format("[Hapi] '%s %s' terminé avec code: %d", block.method, block.url, code),
           code == 0 and vim.log.levels.INFO or vim.log.levels.ERROR
         )
       end,

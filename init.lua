@@ -1,7 +1,7 @@
 local M = {}
 
-local config = require("voiden.config")
-local commands = require("voiden.commands")
+local config = require("hapi.config")
+local commands = require("hapi.commands")
 
 -- Setup du plugin avec des configurations par défaut
 -- @param opts table|nil: Configuration utilisateur
