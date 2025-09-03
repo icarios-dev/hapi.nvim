@@ -41,6 +41,10 @@ plugin and my first experience developing in Lua.
 
 ## Getting Started
 
+### Repository
+
+Clone or explore the plugin on GitHub: [GitHub Repository](https://github.com/icarios-dev/hapi.nvim)
+
 ### Prerequisites
 
 - Neovim 0.8+
